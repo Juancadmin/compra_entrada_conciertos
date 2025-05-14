@@ -51,13 +51,95 @@
     <div id="localidad-container" class="hidden">
         <label for="localidad">Tipo de localidad:</label>
         <select id="localidad">
-            <option value="" selected disabled>Seleccione localidad</option>
+            <option value="" selected disabled>Seleccione la localidad</option>
             <option value="general">General ($350,000)</option>
             <option value="vip">VIP ($500,000)</option>
         </select>
     </div>
     
   
+    <button id="calcularTotalCompra" class="hidden">Calcular total compra boletas</button>
+    
+
+    <div id="resumen" class="hidden">
+        <h3>Resumen de Compra</h3>
+        <div id="detalle-compra"></div>
+        <button id="confirmar">Confirmar Compra</button>
+    </div>
+    
+    <div id="confirmacion" class="hidden">
+        <h3>OK</h3>
+        <p>Haz comprado tus boletas </p>
+    </div>
+
+    <script>
+        // Elementos del DOM
+        const cantidadSelect = document.getElementById('cantidad');
+        const localidadContainer = document.getElementById('localidad-container');
+        const localidadSelect = document.getElementById('localidad');
+        const calcularBtn = document.getElementById('calcular');
+        const resumenDiv = document.getElementById('resumen');
+        const detalleCompra = document.getElementById('detalle-compra');
+        const confirmarBtn = document.getElementById('confirmar');
+        const confirmacionDiv = document.getElementById('confirmacion');
+        
+        // Precios
+        const precios = {
+            general: 350000,
+            vip: 500000
+        };
+        
+        // Evento al cambiar la cantidad
+        cantidadSelect.addEventListener('change', function() {
+            if (this.value) {
+                localidadContainer.classList.remove('hidden');
+                calcularBtn.classList.remove('hidden');
+            } else {
+                localidadContainer.classList.add('hidden');
+                calcularBtn.classList.add('hidden');
+            }
+        });
+        
+        // Evento para calcular total
+        calcularBtn.addEventListener('click', function() {
+            if (!localidadSelect.value) {
+                alert('Por favor seleccione la localidad');
+                return;
+            }
+            
+            const cantidad = parseInt(cantidadSelect.value);
+            const localidad = localidadSelect.value;
+            const precioUnitario = precios[localidad];
+            let total = cantidad * precioUnitario;
+            
+            // Aplicar descuento si es 1 VIP y 1 General
+            let descuento = 0;
+            if (cantidad === 2 && localidad === 'vip') {
+                descuento = total * 0.20; // 20% de descuento
+                total -= descuento;
+            }
+            
+            // Mostrar resumen
+            let html = `
+                <p>Cantidad: ${cantidad} boleta(s) ${localidad.toUpperCase()}</p>
+                <p>Precio unitario: $${precioUnitario.toLocaleString()}</p>
+            `;
+            
+            if (descuento > 0) {
+                html += `<p>Descuento (20%): -$${descuento.toLocaleString()}</p>`;
+            }
+            
+            html += `<p><strong>Total: $${total.toLocaleString()}</strong></p>`;
+            
+            detalleCompra.innerHTML = html;
+            resumenDiv.classList.remove('hidden');
+        });
+        
+        // Evento para confirmar compra
+        confirmarBtn.addEventListener('click', function() {
+            resumenDiv.classList.add('hidden');
+            confirmacionDiv.classList.remove('hidden');
+        });
     </script>
 </body>
 </html>
